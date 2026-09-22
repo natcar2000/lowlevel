@@ -9,6 +9,81 @@
 #endif
 
 
+typedef struct 
+{
+    int id;
+    void *memory;
+    size_t size;
+    struct Allocation *next;
+} Allocation;
+
+
+typedef struct 
+{
+    Allocation *first;
+    Allocation *last;
+} Queue;
+
+
+int create_node(void *memory, size_t size);
+int generate_id(void);
+
+
+Queue queue = {NULL, NULL};
+
+
+int create_node(void *memory, size_t size)
+{
+    Allocation *node = malloc(sizeof(Allocation));
+
+    if(node == NULL)
+    {
+        free(memory);
+        return 1;
+    }
+
+    node->id = generate_id();
+    node->memory = memory;
+    node->size = size;
+    node->next = NULL;
+
+    if(queue.first == NULL && queue.last == NULL)
+    {
+        queue.first = node;
+        queue.last = node;
+    }
+    else
+    {
+        Allocation *last_node = queue.last;
+        queue.last = node;
+        last_node->next = node;
+    }
+
+    return 0;
+}
+
+
+int generate_id(void)
+{
+    int id;
+    
+    id = rand() % 100000;
+
+    Allocation *node = queue.first; 
+    
+    while(node != NULL)
+    {
+        if(node->id == id)
+        {
+                id = generate_id();
+        }
+        node = node->next;
+    }
+
+    return id;
+}
+
+
 API void *allocate_memory(size_t size)
 {   
     if(size == 0)
@@ -23,5 +98,11 @@ API void *allocate_memory(size_t size)
         return NULL;
     }
 
+    int allocation = create_node(memory, size);
+    if(allocation != 0)
+    {
+        return NULL;
+    }
+            
     return memory;
 }
