@@ -25,3 +25,9 @@ API void *allocate_memory(size_t size)
 
     return memory;
 }
+
+
+API void free_memory(void *memory)
+{
+    free(memory);
+}
