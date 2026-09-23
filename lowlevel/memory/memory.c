@@ -27,8 +27,8 @@ typedef struct Queue
 
 int create_node(void *memory, size_t size);
 int generate_id(void);
-void *allocate_memory(*memory);
-int free_memory(*memory); 
+void *allocate_memory(void *memory);
+int free_memory(void *memory); 
 
 Queue queue = {NULL, NULL};
 
@@ -136,7 +136,7 @@ API int free_memory(*memory)
                 queue.last = NULL;
             }
             
-            if(node_to_remove == queue->last)
+            if(node_to_remove == queue.last)
             {
                 queue.last = previous;
             }
