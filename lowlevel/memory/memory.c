@@ -147,8 +147,7 @@ API int free_memory(void *memory)
             status = 1;
             return status;
         }
-        
-        
+          
         previous = node_to_remove;
         node_to_remove = node_to_remove->next;
     }    
