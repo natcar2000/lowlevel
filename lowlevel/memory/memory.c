@@ -9,7 +9,7 @@
 #endif
 
 
-typedef struct 
+typedef struct Allocation
 {
     int id;
     void *memory;
@@ -18,7 +18,7 @@ typedef struct
 } Allocation;
 
 
-typedef struct 
+typedef struct Queue
 {
     Allocation *first;
     Allocation *last;
@@ -29,12 +29,10 @@ int create_node(void *memory, size_t size);
 int generate_id(void);
 
 
-Queue *queue = malloc(sizeof(Queue));
-queue->first = NULL;
-queue->last = NULL;
+Queue queue = {NULL, NULL};
 
 
-int create_node(void *memory, size_t size, Queue *queue)
+int create_node(void *memory, size_t size)
 {
     Allocation *node = malloc(sizeof(Allocation));
 
@@ -44,20 +42,20 @@ int create_node(void *memory, size_t size, Queue *queue)
         return 1;
     }
 
-    node->id = generate_id(queue);
+    node->id = generate_id();
     node->memory = memory;
     node->size = size;
     node->next = NULL;
 
-    if(queue->first == NULL && queue->last == NULL)
+    if(queue.first == NULL && queue.last == NULL)
     {
-        queue->first = node;
-        queue->last = node;
+        queue.first = node;
+        queue.last = node;
     }
     else
     {
-        Allocation *last_node = queue->last;
-        queue->last = node;
+        Allocation *last_node = queue.last;
+        queue.last = node;
         last_node->next = node;
     }
 
@@ -66,19 +64,19 @@ int create_node(void *memory, size_t size, Queue *queue)
 
 
 
-int generate_id(Queue *queue)
+int generate_id(void)
 {
     int id;
     
     id = rand() % 100000;
 
-    Allocation *node = queue->first; 
+    Allocation *node = queue.first; 
     
     while(node != NULL)
     {
         if(node->id == id)
         {
-                id = generate_id(queue);
+                id = generate_id();
         }
         node = node->next;
     }
@@ -87,7 +85,7 @@ int generate_id(Queue *queue)
 }
 
 
-API void *allocate_memory(size_t size, Queue *queue)
+API void *allocate_memory(size_t size)
 {   
     if(size == 0)
     {
