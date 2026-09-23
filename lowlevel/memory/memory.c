@@ -125,7 +125,7 @@ API int free_memory(void *memory)
 
     if(node_to_remove == NULL)
     {
-        return 
+        return status;
     }
       
     while(node_to_remove != NULL)
@@ -169,7 +169,7 @@ API int free_memory(void *memory)
 
 API int get_allocation_id(void *memory)
 {
-    Allocation *node = queue->first;
+    Allocation *node = queue.first;
     
     if(node == NULL)
     {
