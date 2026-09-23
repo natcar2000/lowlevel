@@ -74,11 +74,6 @@ int generate_id(void)
 
     Allocation *node = queue.first; 
 
-    if(node == NULL)
-    {
-        return 1;
-    }
-        
     while(node != NULL)
     {
         if(node->id == id)
