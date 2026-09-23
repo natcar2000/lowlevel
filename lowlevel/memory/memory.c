@@ -99,7 +99,7 @@ API void *allocate_memory(size_t size)
         return NULL;
     }
 
-    int allocation = create_node(memory, size, queue);
+    int allocation = create_node(memory, size);
     if(allocation != 0)
     {
         return NULL;
