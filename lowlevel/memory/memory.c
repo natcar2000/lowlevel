@@ -27,9 +27,10 @@ typedef struct Queue
 
 int create_node(void *memory, size_t size);
 int generate_id(void);
-void *allocate_memory(size_t size);
-int free_memory(void *memory); 
-int get_allocation_id(void *memory);
+API void *allocate_memory(size_t size);
+API int free_memory(void *memory); 
+API int get_allocation_id(void *memory);
+API int write_memory(int id, size_t size, const void *data);
 
 Queue queue = {NULL, NULL};
 
