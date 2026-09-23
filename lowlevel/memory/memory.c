@@ -29,10 +29,12 @@ int create_node(void *memory, size_t size);
 int generate_id(void);
 
 
-Queue queue = {NULL, NULL};
+Queue *queue = malloc(sizeof(Queue));
+queue->first = NULL;
+queue->last = NULL;
 
 
-int create_node(void *memory, size_t size)
+int create_node(void *memory, size_t size, Queue *queue)
 {
     Allocation *node = malloc(sizeof(Allocation));
 
@@ -42,20 +44,20 @@ int create_node(void *memory, size_t size)
         return 1;
     }
 
-    node->id = generate_id();
+    node->id = generate_id(queue);
     node->memory = memory;
     node->size = size;
     node->next = NULL;
 
-    if(queue.first == NULL && queue.last == NULL)
+    if(queue->first == NULL && queue->last == NULL)
     {
-        queue.first = node;
-        queue.last = node;
+        queue->first = node;
+        queue->last = node;
     }
     else
     {
-        Allocation *last_node = queue.last;
-        queue.last = node;
+        Allocation *last_node = queue->last;
+        queue->last = node;
         last_node->next = node;
     }
 
@@ -63,19 +65,20 @@ int create_node(void *memory, size_t size)
 }
 
 
-int generate_id(void)
+
+int generate_id(Queue *queue)
 {
     int id;
     
     id = rand() % 100000;
 
-    Allocation *node = queue.first; 
+    Allocation *node = queue->first; 
     
     while(node != NULL)
     {
         if(node->id == id)
         {
-                id = generate_id();
+                id = generate_id(queue);
         }
         node = node->next;
     }
@@ -84,7 +87,7 @@ int generate_id(void)
 }
 
 
-API void *allocate_memory(size_t size)
+API void *allocate_memory(size_t size, Queue *queue)
 {   
     if(size == 0)
     {
@@ -98,7 +101,7 @@ API void *allocate_memory(size_t size)
         return NULL;
     }
 
-    int allocation = create_node(memory, size);
+    int allocation = create_node(memory, size, queue);
     if(allocation != 0)
     {
         return NULL;
