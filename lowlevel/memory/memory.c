@@ -27,7 +27,8 @@ typedef struct Queue
 
 int create_node(void *memory, size_t size);
 int generate_id(void);
-
+void *allocate_memory(*memory);
+int free_memory(*memory); 
 
 Queue queue = {NULL, NULL};
 
@@ -106,4 +107,51 @@ API void *allocate_memory(size_t size)
     }
             
     return memory;
+}
+
+
+API int free_memory(*memory)
+{
+    int status = 0;
+    
+    Allocation *previous = NULL;
+    Allocation *node_to_remove = queue.first;
+      
+    while(node_to_remove != NULL)
+    {
+        if(node_to_remove->memory == memory)
+        {
+            if(previous == NULL)
+            {
+                queue.first = queue.first->next;
+            }
+            
+            else
+            {
+                previous->next = node_to_remove->next;
+            }
+            
+            if(queue.first == NULL)
+            {
+                queue.last = NULL;
+            }
+            
+            if(node_to_remove == queue->last)
+            {
+                queue.last = previous;
+            }
+            
+            free(node_to_remove->memory);
+            free(node_to_remove);
+            
+            status = 1;
+            return status;
+        }
+        
+        
+        previous = node_to_remove;
+        node_to_remove = node_to_remove->next;
+    }    
+    
+    return status;
 }
