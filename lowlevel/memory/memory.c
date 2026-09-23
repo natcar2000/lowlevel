@@ -29,6 +29,7 @@ int create_node(void *memory, size_t size);
 int generate_id(void);
 void *allocate_memory(size_t size);
 int free_memory(void *memory); 
+int get_allocation_id(void *memory);
 
 Queue queue = {NULL, NULL};
 
@@ -72,7 +73,12 @@ int generate_id(void)
     id = rand() % 100000;
 
     Allocation *node = queue.first; 
-    
+
+    if(node == NULL)
+    {
+        return 1;
+    }
+        
     while(node != NULL)
     {
         if(node->id == id)
@@ -112,10 +118,15 @@ API void *allocate_memory(size_t size)
 
 API int free_memory(void *memory)
 {
-    int status = 0;
+    int status = 1;
     
     Allocation *previous = NULL;
     Allocation *node_to_remove = queue.first;
+
+    if(node_to_remove == NULL)
+    {
+        return 
+    }
       
     while(node_to_remove != NULL)
     {
@@ -144,7 +155,7 @@ API int free_memory(void *memory)
             free(node_to_remove->memory);
             free(node_to_remove);
             
-            status = 1;
+            status = 0;
             return status;
         }
           
@@ -153,4 +164,26 @@ API int free_memory(void *memory)
     }    
     
     return status;
+}
+
+
+API int get_allocation_id(void *memory)
+{
+    Allocation *node = queue->first;
+    
+    if(node == NULL)
+    {
+        return 1;
+    }
+    
+    while(node != NULL)
+    {
+        if(node->memory == memory)
+        {
+            return node->id;
+        }
+        node = node->next;
+    }
+    
+    return 1;
 }
