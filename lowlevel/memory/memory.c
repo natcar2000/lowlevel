@@ -31,7 +31,7 @@ int generate_id(void);
 API void *allocate_memory(size_t size);
 API int free_memory(void *memory); 
 API int get_allocation_id(void *memory);
-API int write_memory(int id, size_t size, const void *data);
+API void *write_memory(int id, size_t size, const void *data);
 
 Queue queue = {NULL, NULL};
 
@@ -183,4 +183,37 @@ API int get_allocation_id(void *memory)
     }
     
     return 1;
+}
+
+
+API void *write_memory(int id, size_t size, const void *data)
+{
+    if(size == 0 || data == NULL)
+    {
+        return NULL;
+    }
+     
+    Allocation *node = queue.first;
+    
+    if(node == NULL)
+    {
+        return NULL;
+    }
+    
+    while(node != NULL)
+    {
+        if(node->id == id)
+        {
+            if(size > node->size)
+            {
+                return NULL;
+            }
+            
+            memcpy(node->memory, data, size);
+            return node->memory;
+        }
+        node = node->next;
+    }
+    
+    return NULL;
 }
