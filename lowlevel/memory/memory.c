@@ -53,6 +53,7 @@ int create_node(void *memory, size_t size)
     node->id = generate_id();
     node->memory = memory;
     node->size = size;
+    node->copy = NULL;
     node->next = NULL;
 
     if(queue.first == NULL && queue.last == NULL)
@@ -69,7 +70,6 @@ int create_node(void *memory, size_t size)
 
     return 0;
 }
-
 
 
 int generate_id(void)
