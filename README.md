@@ -1,28 +1,30 @@
 # lowlevel
 
-Biblioteca de baixo nível para Python desenvolvida em **C**, utilizando `ctypes` para integração entre Python e uma DLL.
+A low-level memory management library for Python, implemented in **C**
+and integrated through `ctypes`.
 
-A `lowlevel` permite trabalhar com **memória bruta**, oferecendo operações de alocação, liberação, identificação, escrita e leitura de dados.
+`lowlevel` provides operations for allocating, freeing, identifying,
+writing, and reading raw memory blocks.
 
-## Versão
+## Version
 
 **v1.0.0**
 
-## Funcionalidades
+## Features
 
-- Alocação dinâmica de memória
-- Liberação de memória
-- Identificação de blocos por ID
-- Escrita de dados em memória
-- Leitura de dados em memória
-- Gerenciamento interno das alocações
-- Integração entre Python e C através de `ctypes`
-- Compilação como DLL
-- Manipulação de dados binários
+-   Dynamic memory allocation
+-   Memory deallocation
+-   Allocation identification through numeric IDs
+-   Writing raw bytes to memory
+-   Reading raw bytes from memory
+-   Internal allocation management
+-   Python/C integration through `ctypes`
+-   DLL compilation
+-   Binary data handling
 
-## Arquitetura
+## Architecture
 
-```text
+``` text
 Python
    │
    │ ctypes
@@ -30,7 +32,7 @@ Python
 memory.dll
    │
    ▼
-Código C
+C code
    │
    ├── malloc()
    ├── free()
@@ -39,172 +41,117 @@ Código C
    └── Queue
 ```
 
-Cada bloco de memória possui um **ID numérico** utilizado para localizar a alocação.
+Each allocated memory block receives a numeric ID that can be used to
+locate the allocation.
 
-## API Python
+## Python API
 
 ### `allocate(size)`
 
-Aloca `size` bytes de memória.
+Allocates `size` bytes of memory and returns its address.
 
-```python
+``` python
 address = allocate(1024)
 ```
 
-Retorna o endereço da memória alocada.
-
----
-
 ### `free(address)`
 
-Libera a memória associada ao endereço.
+Frees the memory associated with an address.
 
-```python
+``` python
 free(address)
 ```
 
----
-
 ### `get_id(address)`
 
-Obtém o ID associado a uma alocação.
+Returns the ID associated with an allocation.
 
-```python
+``` python
 allocation_id = get_id(address)
 ```
 
----
-
 ### `write(id, size, data)`
 
-Escreve dados do tipo `bytes` na memória associada ao ID.
+Writes raw `bytes` data to the memory associated with an ID.
 
-```python
+``` python
 data = b"Hello World!"
-
 write(id, len(data), data)
 ```
 
----
-
 ### `read(id, size)`
 
-Lê `size` bytes da memória associada ao ID e retorna os dados como `bytes`.
+Reads `size` bytes from an allocation and returns them as Python
+`bytes`.
 
-```python
+``` python
 data = read(id, len(data))
-
 print(data)
 ```
 
-## Exemplo
+## Example
 
-```python
+``` python
 data = b"Hello World!"
-
 address = allocate(len(data))
 
 try:
-    id = get_id(address)
-
-    write(id, len(data), data)
-
-    result = read(id, len(data))
-
+    allocation_id = get_id(address)
+    write(allocation_id, len(data), data)
+    result = read(allocation_id, len(data))
     print(result)
-
 finally:
     free(address)
 ```
 
-Resultado:
+Output:
 
-```text
+``` text
 b'Hello World!'
 ```
 
-## Dados numéricos
+## Numeric Data
 
-A `lowlevel` trabalha com memória não tipada. Portanto, valores numéricos podem ser convertidos para bytes antes de serem armazenados.
+Because `lowlevel` works with raw memory, numeric values can be
+converted to bytes before being stored.
 
-```python
+``` python
 value = 123456
-
-data = value.to_bytes(
-    4,
-    byteorder="little",
-    signed=True
-)
+data = value.to_bytes(4, byteorder="little", signed=True)
 
 address = allocate(4)
 
 try:
-    id = get_id(address)
-
-    write(id, 4, data)
-
-    result = read(id, 4)
-
-    value = int.from_bytes(
-        result,
-        byteorder="little",
-        signed=True
-    )
-
+    allocation_id = get_id(address)
+    write(allocation_id, 4, data)
+    result = read(allocation_id, 4)
+    value = int.from_bytes(result, byteorder="little", signed=True)
     print(value)
-
 finally:
     free(address)
 ```
 
-## Teste com áudio
+## Audio Test
 
-A biblioteca também foi testada utilizando um arquivo de áudio.
+`lowlevel` was also tested with audio data. An audio file was loaded as
+bytes, stored in C-managed memory, read back through the library, and
+successfully reproduced with `pygame`.
 
-O áudio foi:
-
-1. carregado pelo Python como `bytes`;
-2. armazenado na memória gerenciada pela DLL;
-3. recuperado através de `read()`;
-4. convertido novamente em dados utilizáveis pelo Python;
-5. enviado ao `pygame`;
-6. reproduzido com sucesso.
-
-```text
-Arquivo de áudio
-       │
-       ▼
-     bytes
-       │
-       ▼
-   allocate()
-       │
-       ▼
-     write()
-       │
-       ▼
-    Memória C
-       │
-       ▼
-      read()
-       │
-       ▼
-     bytes
-       │
-       ▼
-    pygame
-       │
-       ▼
-    Áudio
+``` text
+Audio file → bytes → allocate() → write() → C memory
+                                      │
+                                      ▼
+                              read() → bytes → pygame → Audio
 ```
 
-Esse teste demonstra que a biblioteca pode trabalhar com **dados binários arbitrários**, sem que o código C precise conhecer o tipo dos dados armazenados.
+This demonstrates that the library can handle arbitrary binary data
+without the C layer needing to interpret its semantic type.
 
-## Estrutura interna
+## Internal Structure
 
-Cada alocação é representada por uma estrutura contendo:
+Each allocation is represented by an `Allocation` node:
 
-```c
+``` c
 typedef struct Allocation
 {
     int id;
@@ -215,9 +162,9 @@ typedef struct Allocation
 } Allocation;
 ```
 
-As alocações são organizadas internamente por uma fila:
+Allocations are managed through a queue:
 
-```c
+``` c
 typedef struct Queue
 {
     Allocation *first;
@@ -225,52 +172,51 @@ typedef struct Queue
 } Queue;
 ```
 
-## Compilação
+## Compilation
 
-Utilizando GCC/MinGW-w64:
+Using GCC/MinGW-w64:
 
-```bash
+``` bash
 gcc -shared -Wall -Wextra -o memory.dll memory.c
 ```
 
-A DLL gerada deve estar disponível para o código Python:
+The generated `memory.dll` must be available to the Python application.
 
-```text
-memory.dll
-```
+## Technologies
 
-## Tecnologias
-
-- C
-- Python
-- `ctypes`
-- GCC / MinGW-w64
-- DLL
-- pygame
+-   C
+-   Python
+-   `ctypes`
+-   GCC / MinGW-w64
+-   DLL
+-   pygame
 
 ## Status
 
-**v1.0.0 — Concluída**
+**v1.0.0 --- Completed**
 
-- [x] Alocação de memória
-- [x] Liberação de memória
-- [x] IDs para alocações
-- [x] Escrita de bytes
-- [x] Leitura de bytes
-- [x] Integração Python/C
-- [x] DLL funcional
-- [x] Teste com valores numéricos
-- [x] Teste com arquivo de áudio
-- [x] Reprodução de áudio após passagem pela memória C
+-   [x] Memory allocation
+-   [x] Memory deallocation
+-   [x] Allocation IDs
+-   [x] Byte writing
+-   [x] Byte reading
+-   [x] Python/C integration
+-   [x] Functional DLL
+-   [x] Numeric data testing
+-   [x] Audio data testing
+-   [x] Successful audio playback
 
-## Objetivo do projeto
+## Project Objective
 
-A `lowlevel` foi desenvolvida como um projeto prático para estudar **programação de baixo nível, gerenciamento de memória, ponteiros, estruturas de dados, C e integração entre C e Python**.
+`lowlevel` was developed as a practical project for studying **low-level
+programming, memory management, pointers, data structures, C, and
+Python/C integration**.
 
-O projeto também serve como base para futuras aplicações que necessitem manipular dados binários diretamente na memória.
+It also provides a foundation for future applications that require
+direct manipulation of binary data in memory.
 
----
+------------------------------------------------------------------------
 
 **lowlevel v1.0.0**
 
-Desenvolvido por **Natanael Rodrigues**.
+Developed by **Natanael Rodrigues**.
