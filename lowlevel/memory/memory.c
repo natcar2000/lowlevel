@@ -35,7 +35,7 @@ API int get_allocation_id(void *memory);
 Allocation *return_node(int id);
 int validate(size_t size, size_t allocation_size, const void *data);
 API void *write_memory(int id, size_t size, const void *data);
-API void *read_memory(int id, size_t size, const void *data);
+API void *read_memory(int id, size_t size);
 
 Queue queue = {NULL, NULL};
 
@@ -251,7 +251,7 @@ API void *write_memory(int id, size_t size, const void *data)
 }
 
 
-API void *read_memory(int id, size_t size, const void *data)
+API void *read_memory(int id, size_t size)
 {
     Allocation *node = return_node(id);
     
@@ -260,7 +260,7 @@ API void *read_memory(int id, size_t size, const void *data)
         return NULL;
     }
     
-    int validation = validate(size, node->size, data);
+    int validation = validate(size, node->size, node->memory);
     
     if (validation == 1)
     {
@@ -276,7 +276,7 @@ API void *read_memory(int id, size_t size, const void *data)
             return NULL;
         }
         
-        memcpy(copy, data, size);
+        memcpy(copy, node->memory, size);
         
         node->copy = copy;
         
