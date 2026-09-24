@@ -1,7 +1,10 @@
+from pathlib import Path
 import ctypes
 
 
-memory = ctypes.CDLL("./memory.dll")
+dll_path = Path(__file__).parent / "memory.dll"
+
+memory = ctypes.CDLL(str(dll_path))
 
 memory.allocate_memory.argtypes = [ctypes.c_size_t]
 memory.allocate_memory.restype = ctypes.c_void_p
