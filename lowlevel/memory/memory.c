@@ -15,6 +15,7 @@ typedef struct Allocation
     int id;
     void *memory;
     size_t size;
+    void *copy;
     struct Allocation *next;
 } Allocation;
 
@@ -153,6 +154,7 @@ API int free_memory(void *memory)
             }
             
             free(node_to_remove->memory);
+            free(node_to_remove->copy);
             free(node_to_remove);
             
             status = 0;
