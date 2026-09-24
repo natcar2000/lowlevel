@@ -32,6 +32,7 @@ API void *allocate_memory(size_t size);
 API int free_memory(void *memory); 
 API int get_allocation_id(void *memory);
 API void *write_memory(int id, size_t size, const void *data);
+API void *read_memory(size_t size, const void *data);
 
 Queue queue = {NULL, NULL};
 
@@ -216,4 +217,18 @@ API void *write_memory(int id, size_t size, const void *data)
     }
     
     return NULL;
+}
+
+
+API void *read_memory(size_t size, const void *data)
+{
+    if(size == 0 || data == NULL)
+    {
+        return NULL;
+    }
+    
+    void *copy = malloc(size);
+    memcpy(copy, data, size);
+    
+    return copy;
 }
