@@ -35,7 +35,7 @@ API int get_allocation_id(void *memory);
 Allocation *return_node(int id);
 int validate(size_t size, size_t allocation_size, const void *data);
 API void *write_memory(int id, size_t size, const void *data);
-API void *read_memory(size_t size, const void *data);
+API void *read_memory(int id, size_t size, const void *data);
 
 Queue queue = {NULL, NULL};
 
