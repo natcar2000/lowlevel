@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lowlevel"
+version = "1.0.0"
+description = "Low-level memory management library for Python using C"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+    { name = "Natanael Rodrigues" }
+]
+license = { text = "GPL" }
+
+[project.urls]
+Homepage = "https://github.com/natcar2000/lowlevel"
+Repository = "https://github.com/natcar2000/lowlevel"
