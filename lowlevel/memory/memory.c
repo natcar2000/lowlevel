@@ -228,6 +228,12 @@ API void *read_memory(size_t size, const void *data)
     }
     
     void *copy = malloc(size);
+
+    if(copy == NULL)
+    {
+        return NULL;
+    }
+    
     memcpy(copy, data, size);
     
     return copy;
