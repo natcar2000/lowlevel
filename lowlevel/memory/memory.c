@@ -31,6 +31,8 @@ int generate_id(void);
 API void *allocate_memory(size_t size);
 API int free_memory(void *memory); 
 API int get_allocation_id(void *memory);
+Allocation *return_node(int id);
+int validate(size_t size, size_t allocation_size, const void *data);
 API void *write_memory(int id, size_t size, const void *data);
 API void *read_memory(size_t size, const void *data);
 
@@ -187,13 +189,8 @@ API int get_allocation_id(void *memory)
 }
 
 
-API void *write_memory(int id, size_t size, const void *data)
+Allocation *return_node(int id)
 {
-    if(size == 0 || data == NULL)
-    {
-        return NULL;
-    }
-     
     Allocation *node = queue.first;
     
     if(node == NULL)
@@ -205,13 +202,7 @@ API void *write_memory(int id, size_t size, const void *data)
     {
         if(node->id == id)
         {
-            if(size > node->size)
-            {
-                return NULL;
-            }
-            
-            memcpy(node->memory, data, size);
-            return node->memory;
+            return node;
         }
         node = node->next;
     }
@@ -220,21 +211,75 @@ API void *write_memory(int id, size_t size, const void *data)
 }
 
 
-API void *read_memory(size_t size, const void *data)
+int validate(size_t size, size_t allocation_size, const void *data)
 {
     if(size == 0 || data == NULL)
     {
-        return NULL;
+        return 0;
     }
     
-    void *copy = malloc(size);
+    if(size > allocation_size)
+    {
+        return 0;
+    }
 
-    if(copy == NULL)
+    return 1;
+}
+
+
+API void *write_memory(int id, size_t size, const void *data)
+{
+    Allocation *node = return_node(id);
+    
+    if(node == NULL)
     {
         return NULL;
     }
     
-    memcpy(copy, data, size);
+    int validation = validate(size, node->size, data);
     
-    return copy;
+    if(validation == 1)
+    {
+        
+        memcpy(node->memory, data, size);
+        return node->memory;
+    }
+    
+    return NULL;
+}
+
+
+API void *read_memory(int id, size_t size, const void *data)
+{
+    Allocation *node = return_node(id);
+    
+    if(node == NULL)
+    {
+        return NULL;
+    }
+    
+    int validation = validate(size, node->size, data);
+    
+    if (validation == 1)
+    {
+        if(node->copy != NULL)
+        {
+            free(node->copy);
+        }
+        
+        void *copy = malloc(size);
+        
+        if(copy == NULL)
+        {
+            return NULL;
+        }
+        
+        memcpy(copy, data, size);
+        
+        node->copy = copy;
+        
+        return copy;
+    }
+    
+    return NULL;
 }
